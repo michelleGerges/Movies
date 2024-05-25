@@ -9,6 +9,8 @@ import UIKit
 
 class MoviesListViewModel {
     
+    @Dependency private var moviesUseCae: MoviesUseCase
+    
     let moviesListType: MovieListType
     
     init(moviesListType: MovieListType) {
