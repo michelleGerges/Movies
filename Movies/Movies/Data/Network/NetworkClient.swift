@@ -21,24 +21,25 @@ class NetworkClient {
             fatalError("Error: Invalid URL format")
         }
         
-        var request = URLRequest(url: url)
+        var request = URLRequest(url: url, cachePolicy: .reloadIgnoringCacheData)
         request.httpMethod = endPoint.method.rawValue
-        request = requestWithBody(request, endPoint: endPoint)
+        request = requestWithHeader(request, endPoint: endPoint)
         
         do {
             let (data, response) = try await urlSession.data(for: request)
-            return try handleData(data, andResponse: response)
+            return try handleData(data, response: response)
         } catch {
             throw (error as? ErrorHandler) ?? ErrorHandler.netowrk
         }
     }
     
-    func handleData<T: Codable>(_ data: Data, andResponse response: URLResponse) throws -> T {
+    private func handleData<T: Codable>(_ data: Data, response: URLResponse) throws -> T {
         guard let httpResponse = response as? HTTPURLResponse else {
             throw ErrorHandler.serialization
         }
         do {
             if httpResponse.statusCode == 200 {
+                print(String(data: data, encoding: String.Encoding.utf8) ?? "NOT JSON")
                 return try JSONDecoder().decode(T.self, from: data)
             } else {
                 print("Status Code:", httpResponse.statusCode)
@@ -52,21 +53,19 @@ class NetworkClient {
         }
     }
     
-    func requestWithBody(_ request:URLRequest, endPoint: EndPoint) -> URLRequest {
+    private func requestWithHeader(_ request:URLRequest, endPoint: EndPoint) -> URLRequest {
         
-        guard let body = endPoint.body else {
+        guard let headerFields = endPoint.headerFields else {
             return request
         }
         
         var request = request
-        
-        do {
-            let encoder = JSONEncoder()
-            let data = try encoder.encode(body)
-            request.httpBody = data
-            return request
-        } catch {
-            fatalError("Error encoding dictionary to JSON: \(error)")
+
+        request.allHTTPHeaderFields = request.allHTTPHeaderFields ?? [:]
+        headerFields.forEach {
+            request.allHTTPHeaderFields?[$0] = $1
         }
+        
+        return request
     }
 }

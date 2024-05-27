@@ -9,42 +9,45 @@ import Foundation
 
 enum EndPoint {
     
+    case configuration
     case getMoviesList(_ type: MovieListType)
-    case getMovieDetials
+    case getMovieDetails(_ id: Int)
     
     var baseURL: String {
-        return "https://api.themoviedb.org"
+        return Constants.Network.baseURL
     }
     
     var path: String {
         switch self {
+        case .configuration:
+            return Constants.Network.EndPointPath.configuration
         case .getMoviesList(let type):
-            return "3/movie/\(type.key)"
-        case .getMovieDetials:
-            return ""
+            return "\(Constants.Network.EndPointPath.moviesList)/\(type.key)"
+        case .getMovieDetails(let id):
+            return "\(Constants.Network.EndPointPath.movieDetails)/\(id)"
         }
     }
     
     var method: EndPointMethod {
         switch self {
-        case .getMoviesList:
-            return .get
-        case .getMovieDetials:
+        case .configuration, .getMoviesList, .getMovieDetails:
             return .get
         }
     }
     
+    var headerFields: [String: String]? {
+        ["Authorization": "Bearer \(Constants.Network.token)"]
+    }
+    
     var body: Encodable? {
         switch self {
-        case .getMoviesList:
-            return nil
-        case .getMovieDetials:
+        case .configuration, .getMoviesList, .getMovieDetails:
             return nil
         }
     }
     
     var fullURL: String {
-        "\(baseURL)/\(path)"
+        "\(baseURL)\(path)"
     }
 }
 

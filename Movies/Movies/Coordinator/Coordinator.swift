@@ -1,5 +1,5 @@
 //
-//  MoviesList.swift
+//  Coordinator.swift
 //  Movies
 //
 //  Created by Michelle on 25/05/2024.
@@ -7,6 +7,6 @@
 
 import Foundation
 
-struct MoviesList {
-    
+protocol Coordinator: AnyObject {
+    func start()
 }

@@ -11,7 +11,7 @@ import Foundation
 struct Dependency<T> {
     
     var dependency: T
-    
+
     init() {
         guard let resolved = DependencyContainer.resolve(T.self) else {
             fatalError("No Dependency Resolved for \(T.self)")
@@ -20,12 +20,8 @@ struct Dependency<T> {
     }
     
     var wrappedValue: T {
-        get {
-            dependency
-        }
-        set {
-            dependency = newValue
-        }
+        get { dependency }
+        set { dependency = newValue }
     }
 }
 
@@ -43,12 +39,24 @@ class DependencyContainer {
     
     static func registerDependencies() {
         
-        self.register(URLSession.self, URLSession.shared)
-        self.register(NetworkClient.self, NetworkClient.shared)
+        register(URLSession.self, URLSession.shared)
+        register(NetworkClient.self, NetworkClient.shared)
         
-        self.register(MoviesRemoteDataRepository.self, MoviesRemoteDataRepositoryImplementation())
-        self.register(MoviesLocalDataReposistory.self, MoviesLocalDataReposistoryImplementation())
+        registerConfiguration()
+        registerMoviesListDepndencies()
+    }
+    
+    private static func registerConfiguration() {
+        register(ConfigurationRemoteDataRepository.self, ConfigurationRemoteDataRepositoryImplementation())
+        register(ConfigurationLocalDataRepository.self, ConfigurationLocalDataRepositoryImplementation())
         
-        self.register(MoviesUseCase.self, MoviesUseCaseImplementaiton())
+        register(ConfigurationUseCase.self, ConfigurationUseCaseImplementation())
+    }
+    
+    private static func registerMoviesListDepndencies() {
+        register(MoviesRemoteDataRepository.self, MoviesRemoteDataRepositoryImplementation())
+        register(MoviesLocalDataReposistory.self, MoviesLocalDataReposistoryImplementation())
+        
+        register(MoviesUseCase.self, MoviesUseCaseImplementaiton())
     }
 }

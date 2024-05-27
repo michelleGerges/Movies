@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-class MoviesCoordinator: Coordintaor {
+class MoviesCoordinator: Coordinator {
     
     let navigationController: UINavigationController
     let movieListType: MovieListType
@@ -22,7 +22,12 @@ class MoviesCoordinator: Coordintaor {
         
         let viewModel = MoviesListViewModel(moviesListType: movieListType)
         let rootViewController = MoviesListViewController(viewModel: viewModel)
+        
         navigationController.viewControllers = [rootViewController]
-        navigationController.tabBarItem = UITabBarItem(title: movieListType.title, image: nil, tag: 0)
+        navigationController.tabBarItem.title = movieListType.title
+    }
+    
+    func navigateToMovie(_ id: Int) {
+        
     }
 }
