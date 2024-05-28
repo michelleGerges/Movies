@@ -15,13 +15,23 @@ protocol ConfigurationLocalDataRepository {
 
 class ConfigurationLocalDataRepositoryImplementation: ConfigurationLocalDataRepository {
     
+    @Dependency private var userDefauls: UserDefaults
     static var configuration: Configuration?
     
     var configuration: Configuration? {
-        Self.configuration
+        if let configuration = Self.configuration {
+            return configuration
+        }
+        
+        guard let data = userDefauls.object(forKey: "Configuration") as? Data else {
+            return nil
+        }
+        
+        Self.configuration = try? JSONDecoder().decode(Configuration.self, from: data)
+        return Self.configuration
     }
     
     func saveConfiguration(_ config: Configuration) {
-        Self.configuration = config
+        userDefauls.set(try? JSONEncoder().encode(config), forKey: "Configuration")
     }
 }

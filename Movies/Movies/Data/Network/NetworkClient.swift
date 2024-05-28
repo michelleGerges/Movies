@@ -39,7 +39,6 @@ class NetworkClient {
         }
         do {
             if httpResponse.statusCode == 200 {
-                print(String(data: data, encoding: String.Encoding.utf8) ?? "NOT JSON")
                 return try JSONDecoder().decode(T.self, from: data)
             } else {
                 print("Status Code:", httpResponse.statusCode)

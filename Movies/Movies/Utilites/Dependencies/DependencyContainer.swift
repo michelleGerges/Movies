@@ -39,6 +39,7 @@ class DependencyContainer {
     
     static func registerDependencies() {
         
+        register(UserDefaults.self, UserDefaults.standard)
         register(URLSession.self, URLSession.shared)
         register(NetworkClient.self, NetworkClient.shared)
         

@@ -13,8 +13,8 @@ class LandingViewModel {
     @Dependency fileprivate var useCase: ConfigurationUseCase
     @Published var error: Error?
     
-    var subscriptions = Set<AnyCancellable>()
     weak var coordinator: AppCoordinator?
+    fileprivate var subscriptions = Set<AnyCancellable>()
     
     init(coordinator: AppCoordinator) {
         self.coordinator = coordinator
@@ -23,14 +23,17 @@ class LandingViewModel {
 
 extension LandingViewModel {
     
-    @MainActor func loadConfiguration() {
-        Task {
-            do {
-                try await useCase.loadConfiguration()
-                coordinator?.navigateToMovies()
-            } catch {
-                self.error = error
+    func loadConfiguration() {
+        useCase
+            .loadConfiguration()
+            .receive(on: DispatchQueue.main)
+            .sink { completed in
+                if case .failure(let error) = completed {
+                    self.error = error
+                }
+            } receiveValue: { _ in
+                self.coordinator?.navigateToMovies()
             }
-        }
+            .store(in: &subscriptions)
     }
 }

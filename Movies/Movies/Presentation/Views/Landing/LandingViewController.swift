@@ -31,6 +31,7 @@ class LandingViewController: UIViewController {
         viewModel
             .$error
             .compactMap({ $0 })
+            .receive(on: DispatchQueue.main)
             .sink(receiveValue: { [weak self] in
                 self?.showAlertWithError(message: $0.message, tryAgainAction: {
                     self?.viewModel.loadConfiguration()
