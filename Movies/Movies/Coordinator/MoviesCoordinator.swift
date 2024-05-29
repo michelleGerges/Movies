@@ -21,13 +21,17 @@ class MoviesCoordinator: Coordinator {
     func start() {
         
         let viewModel = MoviesListViewModel(moviesListType: movieListType)
+        viewModel.coordinator = self
         let rootViewController = MoviesListViewController(viewModel: viewModel)
         
         navigationController.viewControllers = [rootViewController]
         navigationController.tabBarItem.title = movieListType.title
     }
     
-    func navigateToMovie(_ id: Int) {
-        
+    func navigateToMovieDetails(_ id: Int) {
+        let viewModel = MovieDetailsViewModel(movieID: id)
+        let viewController = MovieDetailsViewController(viewModel: viewModel)
+        viewController.hidesBottomBarWhenPushed = true
+        navigationController.show(viewController, sender: nil)
     }
 }

@@ -29,7 +29,7 @@ class DependencyContainer {
     
     private static var factories: [String: () -> Any] = [:]
     
-    private static func register<T>(_ dependency: T.Type, _ factory: @autoclosure @escaping () -> T) {
+    static func register<T>(_ dependency: T.Type, _ factory: @autoclosure @escaping () -> T) {
         factories[String(describing: T.self)] = factory
     }
     
@@ -45,6 +45,7 @@ class DependencyContainer {
         
         registerConfiguration()
         registerMoviesListDepndencies()
+        registerMovieDetailsDepndencies()
     }
     
     private static func registerConfiguration() {
@@ -59,5 +60,12 @@ class DependencyContainer {
         register(MoviesLocalDataReposistory.self, MoviesLocalDataReposistoryImplementation())
         
         register(MoviesUseCase.self, MoviesUseCaseImplementaiton())
+    }
+    
+    private static func registerMovieDetailsDepndencies() {
+        register(MovieDetailsRemoteDataRepository.self, MovieDetailsRemoteDataRepositoryImplementation())
+        register(MovieDetailsLocalDataRepository.self, MovieDetailsLocalDataRepositoryImplementation())
+        
+        register(MovieDetialsUseCase.self, MovieDetailsUseCaseImplementaiton())
     }
 }

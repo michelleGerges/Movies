@@ -23,7 +23,7 @@ class ConfigurationUseCaseImplementation: ConfigurationUseCase {
     }
     
     func loadConfiguration() ->  AnyPublisher<Configuration, Error> {
-        Future  { promise in
+        Future { promise in
             Task {
                 do {
                     let data = try await self.remoteRepo.loadConfiguration()

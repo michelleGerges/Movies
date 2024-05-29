@@ -57,7 +57,7 @@ class MoviesListViewController: UIViewController {
             .store(in: &subscriptions)
         
         viewModel
-            .$error
+            .$loadMoviesListError
             .receive(on: DispatchQueue.main)
             .compactMap { $0 }
             .sink {
@@ -91,5 +91,9 @@ extension MoviesListViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
         UITableView.automaticDimension
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        viewModel.selectMovieAt(indexPath)
     }
 }

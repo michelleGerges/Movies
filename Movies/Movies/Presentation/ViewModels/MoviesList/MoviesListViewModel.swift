@@ -18,9 +18,10 @@ class MoviesListViewModel {
     } ()
     
     let moviesListType: MovieListType
+    weak var coordinator: MoviesCoordinator?
     
     @Published var moviesViewModels = [MovieCellViewModel]()
-    @Published var error: Error? = nil
+    @Published var loadMoviesListError: Error? = nil
     
     fileprivate var subscriptions = Set<AnyCancellable>()
     
@@ -32,17 +33,12 @@ class MoviesListViewModel {
 extension MoviesListViewModel {
     
     func loadMovies() {
-        bindToUseCase()
-        useCase.loadMovies(moviesListType)
-    }
-    
-    func bindToUseCase() {
         useCase
-            .moviesList
+            .loadMovies(moviesListType)
             .receive(on: DispatchQueue.main)
             .sink { completed in
                 if case .failure(let error) = completed {
-                    self.error = error
+                    self.loadMoviesListError = error
                 }
             } receiveValue: { moviesList in
                 self.moviesViewModels = self.makeMovieCellViewModels(moviesList)
@@ -63,6 +59,10 @@ extension MoviesListViewModel {
     func movieCellViewModelAt(_ indexPath: IndexPath) -> MovieCellViewModel {
         moviesViewModels[indexPath.row]
     }
+    
+    func selectMovieAt(_ indexPath: IndexPath) {
+        coordinator?.navigateToMovieDetails(moviesViewModels[indexPath.row].id)
+    }
 }
 
 extension MoviesListViewModel {
@@ -72,18 +72,19 @@ extension MoviesListViewModel {
     }
     
     func makeMovieCellViewModel(_ movie: Movie) -> MovieCellViewModel? {
-        guard let title = movie.title,
-              let url = makeMovieUrl(movie.posterPath),
+        guard let id = movie.id,
+              let title = movie.title,
+              let url = makeMoviePosterUrl(movie),
               let releaseDate = makeMovieReleaseDate(movie.releaseDate) else {
             return nil
         }
-        return MovieCellViewModel(title: title, releaseDate: releaseDate, posterUrl: url)
+        return MovieCellViewModel(id: id, title: title, releaseDate: releaseDate, posterUrl: url)
     }
     
-    func makeMovieUrl(_ path: String?) -> URL? {
-        guard let imageBaseUrl = configuration?.images?.baseUrl,
-              let posterSize = configuration?.images?.posterSizes?.suffix(2).first,
-              let path = path else {
+    func makeMoviePosterUrl(_ movie: Movie) -> URL? {
+        guard let path = movie.posterPath,
+              let imageBaseUrl = configuration?.images?.baseUrl,
+              let posterSize = configuration?.images?.posterSizes?.suffix(2).first else {
             return nil
         }
         return URL(string: "\(imageBaseUrl)/\(posterSize)/\(path)")

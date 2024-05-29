@@ -9,9 +9,7 @@ import Foundation
 import Combine
 
 protocol MoviesUseCase {
-    
-    var moviesList: AnyPublisher<MoviesList, Error> { get }
-    func loadMovies(_ type: MovieListType)
+    func loadMovies(_ type: MovieListType) -> AnyPublisher<MoviesList, Error>
 }
 
 class MoviesUseCaseImplementaiton: MoviesUseCase {
@@ -19,13 +17,10 @@ class MoviesUseCaseImplementaiton: MoviesUseCase {
     @Dependency private var remoteRepo: MoviesRemoteDataRepository
     @Dependency private var localRepo: MoviesLocalDataReposistory
     
-    private var subject = PassthroughSubject<MoviesList, Error>()
+    private var subject: PassthroughSubject<MoviesList, Error>?
     
-    var moviesList: AnyPublisher<MoviesList, any Error> {
-        subject.eraseToAnyPublisher()
-    }
-    
-    func loadMovies(_ type: MovieListType) {
+    func loadMovies(_ type: MovieListType) -> AnyPublisher<MoviesList, Error> {
+        let subject = PassthroughSubject<MoviesList, Error>()
         Task {
             do {
                 let data = try await remoteRepo.loadMovies(type)
@@ -38,5 +33,7 @@ class MoviesUseCaseImplementaiton: MoviesUseCase {
                 subject.send(completion: .failure(error))
             }
         }
+        self.subject = subject
+        return subject.eraseToAnyPublisher()
     }
 }
