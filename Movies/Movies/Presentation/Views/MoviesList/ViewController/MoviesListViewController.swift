@@ -61,10 +61,19 @@ class MoviesListViewController: UIViewController {
             .receive(on: DispatchQueue.main)
             .compactMap { $0 }
             .sink {
-                ToastView(message: $0.message)
-                    .show()
+                self.handleError($0)
             }
             .store(in: &subscriptions)
+    }
+    
+    func handleError(_ error: Error) {
+        if viewModel.isEmpty {
+            showAlertWithError(message: error.message, tryAgainAction: {
+                self.viewModel.loadMovies()
+            })
+        } else {
+            ToastView(message: error.message).show()
+        }
     }
 }
 

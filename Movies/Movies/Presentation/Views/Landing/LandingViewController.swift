@@ -9,9 +9,9 @@ import UIKit
 import Combine
 class LandingViewController: UIViewController {
     
-    var viewModel: LandingViewModel
-    var subscriptions = Set<AnyCancellable>()
+    private var subscriptions = Set<AnyCancellable>()
     
+    let viewModel: LandingViewModel
     init(viewModel: LandingViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -29,7 +29,7 @@ class LandingViewController: UIViewController {
     
     func bindToViewModel() {
         viewModel
-            .$error
+            .$loadConfigurationError
             .compactMap({ $0 })
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: { [weak self] in

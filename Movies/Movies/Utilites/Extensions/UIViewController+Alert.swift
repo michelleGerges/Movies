@@ -9,7 +9,7 @@ import UIKit
 
 extension UIViewController {
     
-    func showAlertWithError(message: String, tryAgainAction: @escaping () -> Void) {
+    func showAlertWithError(message: String, tryAgainAction: @escaping () -> Void, cancelAction: (() -> Void)? = nil) {
         let alert = UIAlertController(title: "Error",
                                       message: message,
                                       preferredStyle: .alert)
@@ -17,6 +17,11 @@ extension UIViewController {
         alert.addAction(UIAlertAction(title: "Try Again",
                                       style: .default, handler: { _ in
             tryAgainAction()
+        }))
+        
+        alert.addAction(UIAlertAction(title: "Cancel",
+                                      style: .destructive, handler: { _ in
+            cancelAction?()
         }))
         
         self.present(alert, animated: true, completion: nil)

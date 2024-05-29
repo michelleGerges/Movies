@@ -17,21 +17,23 @@ class MovieDetailsUseCaseImplementaiton: MovieDetialsUseCase {
     @Dependency private var remoteRepo: MovieDetailsRemoteDataRepository
     @Dependency private var localRepo: MovieDetailsLocalDataRepository
     
-    func loadMovieDetials(_ movieID: Int) -> AnyPublisher<MovieDetails, any Error> {
-        Future { promise in
-            Task {
-                do {
-                    let data = try await self.remoteRepo.loadMovieDetails(movieID)
-                    self.localRepo.saveMovieDetails(data)
-                    promise(.success(data))
-                } catch {
-                    if let data = self.localRepo.getMovieDetails(movieID) {
-                        promise(.success(data))
-                    } else {
-                        promise(.failure(error))
-                    }
+    private var subject: PassthroughSubject<MovieDetails, Error>?
+    
+    func loadMovieDetials(_ movieID: Int) -> AnyPublisher<MovieDetails, Error> {
+        let subject = PassthroughSubject<MovieDetails, Error>()
+        Task {
+            do {
+                let data = try await remoteRepo.loadMovieDetails(movieID)
+                localRepo.saveMovieDetails(data)
+                subject.send(data)
+            } catch {
+                if let data = localRepo.getMovieDetails(movieID) {
+                    subject.send(data)
                 }
+                subject.send(completion: .failure(error))
             }
-        }.eraseToAnyPublisher()
+        }
+        self.subject = subject
+        return subject.eraseToAnyPublisher()
     }
 }

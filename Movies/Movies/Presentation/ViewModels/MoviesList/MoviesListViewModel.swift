@@ -13,18 +13,19 @@ class MoviesListViewModel {
     @Dependency private var useCase: MoviesUseCase
     @Dependency private var configurationUseCase: ConfigurationUseCase
     
-    lazy private var configuration: Configuration? = {
-        configurationUseCase.configuration
-    } ()
-    
-    let moviesListType: MovieListType
-    weak var coordinator: MoviesCoordinator?
-    
     @Published var moviesViewModels = [MovieCellViewModel]()
     @Published var loadMoviesListError: Error? = nil
     
-    fileprivate var subscriptions = Set<AnyCancellable>()
+    private var subscriptions = Set<AnyCancellable>()
+    lazy private var configuration: Configuration? = { configurationUseCase.configuration } ()
     
+    var isEmpty: Bool {
+        moviesViewModels.isEmpty
+    }
+    
+    weak var coordinator: MoviesCoordinator?
+    
+    let moviesListType: MovieListType
     init(moviesListType: MovieListType) {
         self.moviesListType = moviesListType
     }

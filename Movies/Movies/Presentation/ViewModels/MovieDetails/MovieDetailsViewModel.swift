@@ -13,26 +13,33 @@ class MovieDetailsViewModel {
     @Dependency private var useCase: MovieDetialsUseCase
     @Dependency private var configurationUseCase: ConfigurationUseCase
     
-    lazy private var configuration: Configuration? = {
-        configurationUseCase.configuration
-    } ()
-    
-    let movieID: Int
-    
     @Published var movieDetailsViewModels = [MovieDetailsCellViewModel]()
     @Published var movieTitle: String?
     @Published var loadMovieDetailsError: Error?
+    @Published var isLoading = false
     
     private var subscriptions = Set<AnyCancellable>()
+    private lazy var configuration: Configuration? = { configurationUseCase.configuration }()
     
+    var isEmpty: Bool {
+        movieDetailsViewModels.isEmpty
+    }
+    
+    let movieID: Int
     init(movieID: Int) {
         self.movieID = movieID
     }
     
     func loadMovieDetilas() {
+        
+        isLoading = true
+        
         useCase
             .loadMovieDetials(movieID)
             .receive(on: DispatchQueue.main)
+            .handleEvents(receiveOutput: { _ in
+                self.isLoading = false
+            })
             .sink { completed in
                 if case .failure(let error) = completed {
                     self.loadMovieDetailsError = error

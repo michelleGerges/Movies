@@ -9,20 +9,19 @@ import UIKit
 import Combine
 
 class MovieDetailsViewController: UIViewController {
-
+    
     @IBOutlet private var movieDetailsTableView: UITableView!
-
-    let viewModel: MovieDetailsViewModel
     
     private var subscriptions = Set<AnyCancellable>()
     
+    let viewModel: MovieDetailsViewModel
     init(viewModel: MovieDetailsViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
     
     required init?(coder: NSCoder) {
-        return nil
+        fatalError("init(coder:) has not been implemented")
     }
     
     override func viewDidLoad() {
@@ -67,10 +66,21 @@ class MovieDetailsViewController: UIViewController {
             .receive(on: DispatchQueue.main)
             .compactMap { $0 }
             .sink {
-                ToastView(message: $0.message)
-                    .show()
+                self.handleError($0)
             }
             .store(in: &subscriptions)
+    }
+    
+    func handleError(_ error: Error) {
+        if viewModel.isEmpty {
+            showAlertWithError(message: error.message, tryAgainAction: {
+                self.viewModel.loadMovieDetilas()
+            }) {
+                self.navigationController?.popViewController(animated: true)
+            }
+        } else {
+            ToastView(message: error.message).show()
+        }
     }
 }
 

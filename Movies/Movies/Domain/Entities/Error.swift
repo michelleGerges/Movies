@@ -25,18 +25,23 @@ struct ServerError: Codable {
 }
 
 extension Error {
+    
+    private var generalErrorMessage: String {
+        "Something went wrong. Kindly try again later!"
+    }
+    
     var message: String {
         guard let errorHandler = self as? ErrorHandler else {
-            return "Something went wrong."
+            return generalErrorMessage
         }
         
         switch errorHandler {
         case .netowrk:
-            return "Network Error"
+            return "Network Error, Kindly check Internet connectivity!"
         case .serialization:
-            return "Something went wrong"
+            return generalErrorMessage
         case .server(let error):
-            return error.message ?? "Something went wrong"
+            return error.message ?? generalErrorMessage
         }
     }
 }

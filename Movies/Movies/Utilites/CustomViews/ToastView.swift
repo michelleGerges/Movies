@@ -57,7 +57,7 @@ class ToastView: UIView {
         self.alpha = 0
         self.translatesAutoresizingMaskIntoConstraints = false
         
-        let margin: CGFloat = 12.0
+        let margin: CGFloat = 8.0
         
         NSLayoutConstraint.activate([
             self.centerXAnchor.constraint(equalTo: window.centerXAnchor),

@@ -11,7 +11,7 @@ import Combine
 class LandingViewModel {
     
     @Dependency fileprivate var useCase: ConfigurationUseCase
-    @Published var error: Error?
+    @Published var loadConfigurationError: Error?
     
     weak var coordinator: AppCoordinator?
     fileprivate var subscriptions = Set<AnyCancellable>()
@@ -29,7 +29,7 @@ extension LandingViewModel {
             .receive(on: DispatchQueue.main)
             .sink { completed in
                 if case .failure(let error) = completed {
-                    self.error = error
+                    self.loadConfigurationError = error
                 }
             } receiveValue: { _ in
                 self.coordinator?.navigateToMovies()
