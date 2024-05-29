@@ -12,7 +12,7 @@ import Combine
 
 final class MoviesListViewModelTests: XCTestCase {
     
-    var viewModel: MoviesListViewModel!
+    var viewModelUnderTest: MoviesListViewModel!
     var mockMoviesUseCase: MockMoviesUseCase!
     var mockConfigurationUseCase: MockConfigurationUseCase!
     var mockCoordinator: MockMoviesCoordinator!
@@ -26,21 +26,21 @@ final class MoviesListViewModelTests: XCTestCase {
         DependencyContainer.register(MoviesUseCase.self, self.mockMoviesUseCase)
         DependencyContainer.register(ConfigurationUseCase.self, self.mockConfigurationUseCase)
         
-        viewModel = MoviesListViewModel(moviesListType: .popular)
-        viewModel.coordinator = mockCoordinator
+        viewModelUnderTest = MoviesListViewModel(moviesListType: .popular)
+        viewModelUnderTest.coordinator = mockCoordinator
     }
     
     override func tearDown() {
-        viewModel = nil
+        viewModelUnderTest = nil
         mockMoviesUseCase = nil
         mockConfigurationUseCase = nil
         super.tearDown()
     }
     
     func testInitialState() {
-        XCTAssertTrue(viewModel.moviesViewModels.isEmpty)
-        XCTAssertNil(viewModel.loadMoviesListError)
-        XCTAssertEqual(viewModel.moviesListType, .popular)
+        XCTAssertTrue(viewModelUnderTest.moviesViewModels.isEmpty)
+        XCTAssertNil(viewModelUnderTest.loadMoviesListError)
+        XCTAssertEqual(viewModelUnderTest.moviesListType, .popular)
     }
     
     func testLoadMoviesSuccess() {
@@ -48,7 +48,7 @@ final class MoviesListViewModelTests: XCTestCase {
         mockMoviesUseCase.moviesList = moviesList
         let expectation = XCTestExpectation(description: "Movies loaded")
         
-        viewModel
+        viewModelUnderTest
             .$moviesViewModels
             .dropFirst()
             .sink { _ in
@@ -56,35 +56,35 @@ final class MoviesListViewModelTests: XCTestCase {
             }
             .store(in: &subscriptions)
         
-        viewModel.loadMovies()
+        viewModelUnderTest.loadMovies()
         
         wait(for: [expectation], timeout: 1.0)
-        XCTAssertEqual(viewModel.moviesViewModels.count, 1)
-        XCTAssertEqual(viewModel.moviesViewModels.first?.title, "Test Movie")
-        XCTAssertNil(viewModel.loadMoviesListError)
-        XCTAssertFalse(viewModel.moviesViewModels.isEmpty)
+        XCTAssertEqual(viewModelUnderTest.moviesViewModels.count, 1)
+        XCTAssertEqual(viewModelUnderTest.moviesViewModels.first?.title, "Test Movie")
+        XCTAssertNil(viewModelUnderTest.loadMoviesListError)
+        XCTAssertFalse(viewModelUnderTest.moviesViewModels.isEmpty)
     }
     
     func testLoadMoviesFailure() {
         mockMoviesUseCase.error = NSError(domain: "", code: -1, userInfo: nil)
         let expectation = XCTestExpectation(description: "Movies failed to load")
         
-        viewModel.$loadMoviesListError
+        viewModelUnderTest.$loadMoviesListError
             .dropFirst()
             .sink { _ in
                 expectation.fulfill()
             }
             .store(in: &subscriptions)
         
-        viewModel.loadMovies()
+        viewModelUnderTest.loadMovies()
         
         wait(for: [expectation], timeout: 1.0)
-        XCTAssertNotNil(viewModel.loadMoviesListError)
-        XCTAssertTrue(viewModel.moviesViewModels.isEmpty)
+        XCTAssertNotNil(viewModelUnderTest.loadMoviesListError)
+        XCTAssertTrue(viewModelUnderTest.moviesViewModels.isEmpty)
     }
     
     func testNumberOfSections() {
-        XCTAssertEqual(viewModel.numberOfSections, 1)
+        XCTAssertEqual(viewModelUnderTest.numberOfSections, 1)
     }
     
     func testNumberOfRowsInSection() {
@@ -95,7 +95,7 @@ final class MoviesListViewModelTests: XCTestCase {
         mockMoviesUseCase.moviesList = moviesList
         let expectation = XCTestExpectation(description: "Movies loaded")
         
-        viewModel
+        viewModelUnderTest
             .$moviesViewModels
             .dropFirst()
             .sink { _ in
@@ -103,10 +103,10 @@ final class MoviesListViewModelTests: XCTestCase {
             }
             .store(in: &subscriptions)
         
-        viewModel.loadMovies()
+        viewModelUnderTest.loadMovies()
         
         wait(for: [expectation], timeout: 1.0)
-        XCTAssertEqual(viewModel.numberOfRowsInSection(0), 2)
+        XCTAssertEqual(viewModelUnderTest.numberOfRowsInSection(0), 2)
     }
     
     func testMovieCellViewModelAt() {
@@ -117,7 +117,7 @@ final class MoviesListViewModelTests: XCTestCase {
         mockMoviesUseCase.moviesList = moviesList
         let expectation = XCTestExpectation(description: "Movies loaded")
         
-        viewModel
+        viewModelUnderTest
             .$moviesViewModels
             .dropFirst()
             .sink { _ in
@@ -125,15 +125,15 @@ final class MoviesListViewModelTests: XCTestCase {
             }
             .store(in: &subscriptions)
         
-        viewModel.loadMovies()
+        viewModelUnderTest.loadMovies()
         
         wait(for: [expectation], timeout: 1.0)
         let indexPath = IndexPath(row: 0, section: 0)
-        XCTAssertEqual(viewModel.movieCellViewModelAt(indexPath).title, "Movie 1")
+        XCTAssertEqual(viewModelUnderTest.movieCellViewModelAt(indexPath).title, "Movie 1")
     }
     
     func testTitle() {
-        XCTAssertEqual(viewModel.title, "Popular") // Assuming moviesListType.title returns "Popular Movies"
+        XCTAssertEqual(viewModelUnderTest.title, "Popular") // Assuming moviesListType.title returns "Popular Movies"
     }
     
     func testMakeMovieCellViewModels() {
@@ -143,7 +143,7 @@ final class MoviesListViewModelTests: XCTestCase {
             Movie(id: 3, posterPath: "/poster3.jpg", releaseDate: "2023-03-01", title: nil)  // This should be ignored
         ])
         
-        let movieCellViewModels = viewModel.makeMovieCellViewModels(moviesList)
+        let movieCellViewModels = viewModelUnderTest.makeMovieCellViewModels(moviesList)
         
         XCTAssertEqual(movieCellViewModels.count, 2)
         XCTAssertEqual(movieCellViewModels[0].title, "Movie 1")
@@ -155,10 +155,10 @@ final class MoviesListViewModelTests: XCTestCase {
     func testSelectMovieAt() {
         let movieCellVM1 = MovieCellViewModel(id: 1, title: "Movie 1", releaseDate: Date(), posterUrl: URL(string: "https://example.com/poster1.jpg")!)
         let movieCellVM2 = MovieCellViewModel(id: 2, title: "Movie 2", releaseDate: Date(), posterUrl: URL(string: "https://example.com/poster2.jpg")!)
-        viewModel.moviesViewModels = [movieCellVM1, movieCellVM2]
+        viewModelUnderTest.moviesViewModels = [movieCellVM1, movieCellVM2]
         
         let indexPath = IndexPath(row: 1, section: 0)
-        viewModel.selectMovieAt(indexPath)
+        viewModelUnderTest.selectMovieAt(indexPath)
         
         XCTAssertTrue(mockCoordinator.didNavigateToMovieDetails)
         XCTAssertEqual(mockCoordinator.selectedMovieID, 2)

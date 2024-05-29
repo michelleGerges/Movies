@@ -11,7 +11,7 @@ import Combine
 @testable import Movies
 
 final class MovieDetailsViewModelTests: XCTestCase {
-    var viewModel: MovieDetailsViewModel!
+    var viewModelUnderTest: MovieDetailsViewModel!
     var mockUseCase: MockMovieDetialsUseCase!
     var mockConfigurationUseCase: MockConfigurationUseCase!
     var subscriptions = Set<AnyCancellable>()
@@ -24,20 +24,20 @@ final class MovieDetailsViewModelTests: XCTestCase {
         DependencyContainer.register(MovieDetialsUseCase.self, self.mockUseCase)
         DependencyContainer.register(ConfigurationUseCase.self, self.mockConfigurationUseCase)
         
-        viewModel = MovieDetailsViewModel(movieID: 123)
+        viewModelUnderTest = MovieDetailsViewModel(movieID: 123)
     }
     
     override func tearDown() {
-        viewModel = nil
+        viewModelUnderTest = nil
         mockUseCase = nil
         mockConfigurationUseCase = nil
         super.tearDown()
     }
     
     func testInitialState() {
-        XCTAssertTrue(viewModel.movieDetailsViewModels.isEmpty)
-        XCTAssertNil(viewModel.movieTitle)
-        XCTAssertNil(viewModel.loadMovieDetailsError)
+        XCTAssertTrue(viewModelUnderTest.movieDetailsViewModels.isEmpty)
+        XCTAssertNil(viewModelUnderTest.movieTitle)
+        XCTAssertNil(viewModelUnderTest.loadMovieDetailsError)
     }
     
     func testLoadMovieDetailsSuccess() {
@@ -45,7 +45,7 @@ final class MovieDetailsViewModelTests: XCTestCase {
         mockUseCase.movieDetails = movieDetails
         let expectation = XCTestExpectation(description: "Movie details loaded")
         
-        viewModel
+        viewModelUnderTest
             .$movieDetailsViewModels
             .dropFirst()
             .sink { _ in
@@ -53,13 +53,13 @@ final class MovieDetailsViewModelTests: XCTestCase {
             }
             .store(in: &subscriptions)
         
-        viewModel.loadMovieDetilas()
+        viewModelUnderTest.loadMovieDetilas()
         
         wait(for: [expectation], timeout: 1.0)
-        XCTAssertEqual(viewModel.movieDetailsViewModels.count, 5)
-        XCTAssertEqual(viewModel.movieTitle, "Test Movie")
-        XCTAssertNil(viewModel.loadMovieDetailsError)
-        XCTAssertFalse(viewModel.isEmpty)
+        XCTAssertEqual(viewModelUnderTest.movieDetailsViewModels.count, 5)
+        XCTAssertEqual(viewModelUnderTest.movieTitle, "Test Movie")
+        XCTAssertNil(viewModelUnderTest.loadMovieDetailsError)
+        XCTAssertFalse(viewModelUnderTest.isEmpty)
     }
     
     func testLoadMovieDetailsTitle() {
@@ -67,7 +67,7 @@ final class MovieDetailsViewModelTests: XCTestCase {
         mockUseCase.movieDetails = movieDetails
         let expectation = XCTestExpectation(description: "Movie title loaded")
         
-        viewModel
+        viewModelUnderTest
             .$movieTitle
             .dropFirst()
             .sink { _ in
@@ -75,17 +75,17 @@ final class MovieDetailsViewModelTests: XCTestCase {
             }
             .store(in: &subscriptions)
         
-        viewModel.loadMovieDetilas()
+        viewModelUnderTest.loadMovieDetilas()
         
         wait(for: [expectation], timeout: 1.0)
-        XCTAssertEqual(viewModel.movieTitle, "Test Movie")
+        XCTAssertEqual(viewModelUnderTest.movieTitle, "Test Movie")
     }
     
     func testLoadMovieDetailsFailure() {
         mockUseCase.error = NSError(domain: "", code: -1, userInfo: nil)
         let expectation = XCTestExpectation(description: "Movie details failed to load")
         
-        viewModel
+        viewModelUnderTest
             .$loadMovieDetailsError
             .dropFirst()
             .sink { _ in
@@ -93,15 +93,15 @@ final class MovieDetailsViewModelTests: XCTestCase {
             }
             .store(in: &subscriptions)
         
-        viewModel.loadMovieDetilas()
+        viewModelUnderTest.loadMovieDetilas()
         
         wait(for: [expectation], timeout: 1.0)
-        XCTAssertNotNil(viewModel.loadMovieDetailsError)
-        XCTAssertTrue(viewModel.isEmpty)
+        XCTAssertNotNil(viewModelUnderTest.loadMovieDetailsError)
+        XCTAssertTrue(viewModelUnderTest.isEmpty)
     }
     
     func testNumberOfSections() {
-        XCTAssertEqual(1, viewModel.numberOfSections)
+        XCTAssertEqual(1, viewModelUnderTest.numberOfSections)
     }
     
     func testNumberOfRowsInSection() {
@@ -109,7 +109,7 @@ final class MovieDetailsViewModelTests: XCTestCase {
         mockUseCase.movieDetails = movieDetails
         let expectation = XCTestExpectation(description: "Movie details loaded")
         
-        viewModel
+        viewModelUnderTest
             .$movieDetailsViewModels
             .dropFirst()
             .sink { _ in
@@ -117,10 +117,10 @@ final class MovieDetailsViewModelTests: XCTestCase {
             }
             .store(in: &subscriptions)
         
-        viewModel.loadMovieDetilas()
+        viewModelUnderTest.loadMovieDetilas()
         
         wait(for: [expectation], timeout: 1.0)
-        XCTAssertEqual(viewModel.numberOfRowsInSection(0), 5)
+        XCTAssertEqual(viewModelUnderTest.numberOfRowsInSection(0), 5)
     }
     
     func testMovieDetailsCellViewModelAt() {
@@ -128,7 +128,7 @@ final class MovieDetailsViewModelTests: XCTestCase {
         mockUseCase.movieDetails = movieDetails
         let expectation = XCTestExpectation(description: "Movie details loaded")
         
-        viewModel
+        viewModelUnderTest
             .$movieDetailsViewModels
             .dropFirst()
             .sink { _ in
@@ -136,32 +136,32 @@ final class MovieDetailsViewModelTests: XCTestCase {
             }
             .store(in: &subscriptions)
         
-        viewModel.loadMovieDetilas()
+        viewModelUnderTest.loadMovieDetilas()
         
         wait(for: [expectation], timeout: 1.0)
-        XCTAssertNotNil(viewModel.movieDetailsCellViewModelAt(IndexPath(row: 0, section: 0)) as? MovieDetailsImageCellViewModel)
-        XCTAssertNotNil(viewModel.movieDetailsCellViewModelAt(IndexPath(row: 1, section: 0)) as? MovieDetailsDescriptionCellViewModel)
-        XCTAssertNotNil(viewModel.movieDetailsCellViewModelAt(IndexPath(row: 2, section: 0)) as? MovieDetailsTitleValueCellViewModel)
-        XCTAssertNotNil(viewModel.movieDetailsCellViewModelAt(IndexPath(row: 3, section: 0)) as? MovieDetailsTitleValueCellViewModel)
+        XCTAssertNotNil(viewModelUnderTest.movieDetailsCellViewModelAt(IndexPath(row: 0, section: 0)) as? MovieDetailsImageCellViewModel)
+        XCTAssertNotNil(viewModelUnderTest.movieDetailsCellViewModelAt(IndexPath(row: 1, section: 0)) as? MovieDetailsDescriptionCellViewModel)
+        XCTAssertNotNil(viewModelUnderTest.movieDetailsCellViewModelAt(IndexPath(row: 2, section: 0)) as? MovieDetailsTitleValueCellViewModel)
+        XCTAssertNotNil(viewModelUnderTest.movieDetailsCellViewModelAt(IndexPath(row: 3, section: 0)) as? MovieDetailsTitleValueCellViewModel)
     }
     
     func testMakeMovieDetailsPosterCell() {
         let movieDetails = MovieDetails(posterPath: "/poster1.jpg")
-        let cellViewModel = viewModel.makeMovieDetailsPosterCell(movieDetails) as? MovieDetailsImageCellViewModel
+        let cellViewModel = viewModelUnderTest.makeMovieDetailsPosterCell(movieDetails) as? MovieDetailsImageCellViewModel
         XCTAssertNotNil(cellViewModel)
         XCTAssertEqual(cellViewModel?.imageURL.absoluteString, "https://example.com/original/poster1.jpg")
     }
     
     func testMakeMovieDetailsOverviewCell() {
         let movieDetails = MovieDetails(overview: "This is the overview")
-        let cellViewModel = viewModel.makeMovieDetailsOverviewCell(movieDetails) as? MovieDetailsDescriptionCellViewModel
+        let cellViewModel = viewModelUnderTest.makeMovieDetailsOverviewCell(movieDetails) as? MovieDetailsDescriptionCellViewModel
         XCTAssertNotNil(cellViewModel)
         XCTAssertEqual(cellViewModel?.description, "This is the overview")
     }
     
     func testMakeMovieDetailsGenresCell() {
         let movieDetails = MovieDetails(genres: [Genre(id: 1, name: "Action"), Genre(id: 2, name: "Drama")])
-        let cellViewModel = viewModel.makeMovieDetailsGenresCell(movieDetails) as? MovieDetailsTitleValueCellViewModel
+        let cellViewModel = viewModelUnderTest.makeMovieDetailsGenresCell(movieDetails) as? MovieDetailsTitleValueCellViewModel
         XCTAssertNotNil(cellViewModel)
         XCTAssertEqual(cellViewModel?.title, "Genres")
         XCTAssertEqual(cellViewModel?.value, "Action, Drama")
@@ -169,13 +169,13 @@ final class MovieDetailsViewModelTests: XCTestCase {
     
     func testMakeMovieDetailsGenresCellNilWhenEmptyGenres() {
         let movieDetails = MovieDetails(genres: [])
-        let cellViewModel = viewModel.makeMovieDetailsGenresCell(movieDetails) as? MovieDetailsTitleValueCellViewModel
+        let cellViewModel = viewModelUnderTest.makeMovieDetailsGenresCell(movieDetails) as? MovieDetailsTitleValueCellViewModel
         XCTAssertNil(cellViewModel)
     }
     
     func testMakeMovieDetailsBudgetCell() {
         let movieDetails = MovieDetails(budget: 1000000)
-        let cellViewModel = viewModel.makeMovieDetailsBudgetCell(movieDetails) as? MovieDetailsTitleValueCellViewModel
+        let cellViewModel = viewModelUnderTest.makeMovieDetailsBudgetCell(movieDetails) as? MovieDetailsTitleValueCellViewModel
         XCTAssertNotNil(cellViewModel)
         XCTAssertEqual(cellViewModel?.title, "Budget")
         XCTAssertEqual(cellViewModel?.value, "US$1,000,000.00")
@@ -183,7 +183,7 @@ final class MovieDetailsViewModelTests: XCTestCase {
     
     func testMakeMovieDetailsRuntimeCell() {
         let movieDetails = MovieDetails(runtime: 120)
-        let cellViewModel = viewModel.makeMovieDetailsRuntimeCell(movieDetails) as? MovieDetailsTitleValueCellViewModel
+        let cellViewModel = viewModelUnderTest.makeMovieDetailsRuntimeCell(movieDetails) as? MovieDetailsTitleValueCellViewModel
         XCTAssertNotNil(cellViewModel)
         XCTAssertEqual(cellViewModel?.title, "Runtime")
         XCTAssertEqual(cellViewModel?.value, "2 hours")
