@@ -14,6 +14,14 @@ struct MoviesList: Codable {
     let totalPages: Int?
     let totalResults: Int?
     
+    init(dates: Dates? = nil, page: Int? = nil, results: [Movie]? = nil, totalPages: Int? = nil, totalResults: Int? = nil) {
+        self.dates = dates
+        self.page = page
+        self.results = results
+        self.totalPages = totalPages
+        self.totalResults = totalResults
+    }
+    
     enum CodingKeys: String, CodingKey {
         case dates
         case page
@@ -48,6 +56,36 @@ struct Movie: Codable {
     let video: Bool?
     let voteAverage: Double?
     let voteCount: Int?
+    
+    init(adult: Bool? = nil,
+         backdropPath: String? = nil,
+         genreIds: [Int]? = nil,
+         id: Int? = nil,
+         originalLanguage: String? = nil,
+         originalTitle: String? = nil,
+         overview: String? = nil,
+         popularity: Double? = nil,
+         posterPath: String? = nil,
+         releaseDate: String? = nil,
+         title: String? = nil,
+         video: Bool? = nil,
+         voteAverage: Double? = nil,
+         voteCount: Int? = nil) {
+        self.adult = adult
+        self.backdropPath = backdropPath
+        self.genreIds = genreIds
+        self.id = id
+        self.originalLanguage = originalLanguage
+        self.originalTitle = originalTitle
+        self.overview = overview
+        self.popularity = popularity
+        self.posterPath = posterPath
+        self.releaseDate = releaseDate
+        self.title = title
+        self.video = video
+        self.voteAverage = voteAverage
+        self.voteCount = voteCount
+    }
     
     enum CodingKeys: String, CodingKey {
         case adult

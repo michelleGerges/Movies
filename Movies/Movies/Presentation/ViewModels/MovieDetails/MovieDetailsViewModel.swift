@@ -16,7 +16,6 @@ class MovieDetailsViewModel {
     @Published var movieDetailsViewModels = [MovieDetailsCellViewModel]()
     @Published var movieTitle: String?
     @Published var loadMovieDetailsError: Error?
-    @Published var isLoading = false
     
     private var subscriptions = Set<AnyCancellable>()
     private lazy var configuration: Configuration? = { configurationUseCase.configuration }()
@@ -31,15 +30,10 @@ class MovieDetailsViewModel {
     }
     
     func loadMovieDetilas() {
-        
-        isLoading = true
-        
+            
         useCase
             .loadMovieDetials(movieID)
             .receive(on: DispatchQueue.main)
-            .handleEvents(receiveOutput: { _ in
-                self.isLoading = false
-            })
             .sink { completed in
                 if case .failure(let error) = completed {
                     self.loadMovieDetailsError = error
@@ -90,7 +84,7 @@ extension MovieDetailsViewModel {
               let posterSize = configuration?.images?.posterSizes?.last else {
             return nil
         }
-        return URL(string: "\(imageBaseUrl)/\(posterSize)/\(path)")
+        return URL(string: "\(imageBaseUrl)/\(posterSize)\(path)")
     }
     
     func makeMovieDetailsOverviewCell(_ movieDetails: MovieDetails) -> MovieDetailsCellViewModel? {

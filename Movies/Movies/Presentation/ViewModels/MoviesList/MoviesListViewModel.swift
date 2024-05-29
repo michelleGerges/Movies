@@ -88,7 +88,7 @@ extension MoviesListViewModel {
               let posterSize = configuration?.images?.posterSizes?.suffix(2).first else {
             return nil
         }
-        return URL(string: "\(imageBaseUrl)/\(posterSize)/\(path)")
+        return URL(string: "\(imageBaseUrl)/\(posterSize)\(path)")
     }
     
     func makeMovieReleaseDate(_ date: String?) -> Date? {
